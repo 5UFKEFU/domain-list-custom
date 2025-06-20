@@ -1,0 +1,15 @@
+domain:gitcode.com
+domain:gitcode.net
+domain:csdn.net
+domain:kaifayun.com
+domain:csdnimg.cn
+domain:csto.com
+domain:csdn.com
+domain:gitchat.cn
+domain:datasea.cn
+domain:codechina.net
+domain:gitbook.cn
+domain:iteye.com
+domain:csdn.net.cn
+domain:programmer.com.cn
+domain:programmer.net.cn

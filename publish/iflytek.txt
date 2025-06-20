@@ -1,0 +1,8 @@
+domain:iflytek.com
+domain:xunfei.cn
+domain:iflyink.com
+domain:iflyrec.com
+domain:ets100.com
+domain:zhixue.com
+domain:changyan.com
+domain:xunfeixxj.com

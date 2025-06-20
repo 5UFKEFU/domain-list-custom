@@ -1,0 +1,2 @@
+domain:kurogames.com:@cn
+domain:aki-game.com:@cn

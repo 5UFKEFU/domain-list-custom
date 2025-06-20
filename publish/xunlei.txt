@@ -1,0 +1,9 @@
+domain:sandai.net
+domain:thunderurl.com
+domain:xunlei.com
+domain:00cdn.com
+domain:88cdn.com
+domain:p2cdn.com
+domain:thundercdn.com
+domain:xycloud.com
+domain:xycdn.com

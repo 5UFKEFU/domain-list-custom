@@ -1,0 +1,4 @@
+domain:tendcloud.com
+domain:talkingdata.com
+domain:talkinggame.com
+domain:cpatrk.net

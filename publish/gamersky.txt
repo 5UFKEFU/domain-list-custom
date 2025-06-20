@@ -1,0 +1,6 @@
+domain:gamersky.com
+domain:click.gamersky.com:@ads
+domain:ja.gamersky.com:@ads
+domain:ja1.gamersky.com:@ads
+domain:ja2.gamersky.com:@ads
+domain:wmbd.gamersky.com:@ads

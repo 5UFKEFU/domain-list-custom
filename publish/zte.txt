@@ -1,0 +1,9 @@
+full:bbs.ztedevices.com
+full:www.ztedevices.com
+domain:nubia.cn
+domain:nubia.com
+domain:redmagic.com
+domain:ztemall.com
+domain:ztems.com
+domain:zte.com.cn
+full:ztedevices.com:@

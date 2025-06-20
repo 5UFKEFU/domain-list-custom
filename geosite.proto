@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package v2ray.core.app.router;
+
+option go_package = "github.com/v2fly/v2ray-core/v5/app/router";
+
+message Domain {
+  enum Type {
+    Plain = 0;
+    Regex = 1;
+    RootDomain = 2;
+    Full = 3;
+  }
+  Type type = 1;
+  string value = 2;
+  string attribute = 3;
+}
+
+message GeoSite {
+  string country_code = 1;
+  repeated Domain domain = 2;
+}
+
+message GeoSiteList {
+  repeated GeoSite entry = 1;
+}

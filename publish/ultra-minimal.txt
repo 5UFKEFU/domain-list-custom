@@ -1,0 +1,6 @@
+domain:google.com
+domain:youtube.com
+domain:facebook.com
+domain:apple.com
+domain:microsoft.com
+domain:github.com

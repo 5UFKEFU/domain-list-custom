@@ -1,0 +1,6 @@
+domain:kumiao.com
+domain:youku.com
+domain:ykimg.com
+domain:mmstat.com
+domain:soku.com
+domain:cibntv.net

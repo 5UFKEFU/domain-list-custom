@@ -1,0 +1,6 @@
+domain:deepin.cn
+domain:deepin.com
+domain:deepin.io
+domain:deepin.org
+domain:chinauos.com
+domain:uniontech.com

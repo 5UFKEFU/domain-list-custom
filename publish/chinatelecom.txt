@@ -1,0 +1,2 @@
+domain:chinatelecomglobal.com:@
+domain:chinatelecomhk.com:@

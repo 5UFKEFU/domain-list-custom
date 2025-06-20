@@ -161,9 +161,18 @@ func (l *ListInfo) parseTypeRule(domain string, rule *router.Domain) error {
 
 func (l *ListInfo) parseAttribute(attr string) (*router.Domain_Attribute, error) {
 	if attr[0] != '@' {
-		return nil, errors.New("invalid attribute: " + attr)
+		fmt.Printf("[警告] 无效属性: %s，已跳过\n", attr)
+		return nil, nil // 跳过无效属性
 	}
 	attr = attr[1:] // Trim out attribute prefix `@` character
+
+	// 只允许小写字母、数字、-、_，否则警告
+	for _, c := range attr {
+		if !(c >= 'a' && c <= 'z') && !(c >= '0' && c <= '9') && c != '-' && c != '_' {
+			fmt.Printf("[警告] 未知属性: @%s，已跳过\n", attr)
+			return nil, nil // 跳过未知属性
+		}
+	}
 
 	var attribute router.Domain_Attribute
 	attribute.Key = strings.ToLower(attr)
@@ -204,6 +213,10 @@ func (l *ListInfo) Flatten(lm *ListInfoMap) error {
 		for filename, attrs := range l.InclusionAttributeMap {
 			for _, attrWanted := range attrs {
 				includedList := (*lm)[filename]
+				if includedList == nil {
+					fmt.Printf("[警告] 文件 %s 不存在于 ListInfoMap 中，跳过\n", filename)
+					continue
+				}
 				switch string(attrWanted) {
 				case "@":
 					l.FullTypeList = append(l.FullTypeList, includedList.FullTypeList...)
@@ -260,6 +273,7 @@ func (l *ListInfo) ToGeoSite(excludeAttrs map[fileName]map[attribute]bool) {
 	geosite := new(router.GeoSite)
 	geosite.CountryCode = string(l.Name)
 	geosite.Domain = append(geosite.Domain, l.FullTypeList...)
+	geosite.Domain = append(geosite.Domain, l.DomainTypeList...)
 	geosite.Domain = append(geosite.Domain, l.DomainTypeUniqueList...)
 	geosite.Domain = append(geosite.Domain, l.RegexpTypeList...)
 
@@ -359,4 +373,163 @@ func (l *ListInfo) ToGFWList() []byte {
 	}
 
 	return gfwlistBytes
+}
+
+// RecursiveIncludeProcessor 递归处理include关系，收集所有被引用的文件
+type RecursiveIncludeProcessor struct {
+	processedFiles   map[fileName]bool
+	allIncludedFiles map[fileName]bool
+}
+
+// NewRecursiveIncludeProcessor 创建新的递归处理器
+func NewRecursiveIncludeProcessor() *RecursiveIncludeProcessor {
+	return &RecursiveIncludeProcessor{
+		processedFiles:   make(map[fileName]bool),
+		allIncludedFiles: make(map[fileName]bool),
+	}
+}
+
+// ProcessRecursiveIncludes 递归处理指定文件的include关系
+func (r *RecursiveIncludeProcessor) ProcessRecursiveIncludes(startFiles []fileName, lm *ListInfoMap) error {
+	for _, startFile := range startFiles {
+		if err := r.processFileRecursively(startFile, lm); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// processFileRecursively 递归处理单个文件
+func (r *RecursiveIncludeProcessor) processFileRecursively(fileName fileName, lm *ListInfoMap) error {
+	// 如果已经处理过，跳过
+	if r.processedFiles[fileName] {
+		return nil
+	}
+
+	r.processedFiles[fileName] = true
+
+	// 获取文件信息
+	listInfo, exists := (*lm)[fileName]
+	if !exists {
+		fmt.Printf("[警告] 文件 %s 不存在，跳过\n", fileName)
+		return nil
+	}
+
+	// 如果文件有include，递归处理
+	if listInfo.HasInclusion {
+		for includedFile := range listInfo.InclusionAttributeMap {
+			r.allIncludedFiles[includedFile] = true
+			if err := r.processFileRecursively(includedFile, lm); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetAllIncludedFiles 获取所有被递归include的文件
+func (r *RecursiveIncludeProcessor) GetAllIncludedFiles() []fileName {
+	var files []fileName
+	for file := range r.allIncludedFiles {
+		files = append(files, file)
+	}
+	return files
+}
+
+// GetMultiCountryCategoryFiles 获取多国家相关的分类文件
+func GetMultiCountryCategoryFiles() []fileName {
+	return []fileName{
+		// 中国分类
+		"CN",
+		"GEOLOCATION-CN",
+		"TLD-CN",
+		"CATEGORY-AI-CN",
+		"CATEGORY-BANK-CN",
+		"CATEGORY-BLOG-CN",
+		"CATEGORY-COLLABORATE-CN",
+		"CATEGORY-DEV-CN",
+		"CATEGORY-DOCUMENTS-CN",
+		"CATEGORY-EDUCATION-CN",
+		"CATEGORY-ELECTRONIC-CN",
+		"CATEGORY-ENTERPRISE-QUERY-PLATFORM-CN",
+		"CATEGORY-ENTERTAINMENT-CN",
+		"CATEGORY-FOOD-CN",
+		"CATEGORY-GAME-ACCELERATOR-CN",
+		"CATEGORY-GAMES-CN",
+		"CATEGORY-HOSPITAL-CN",
+		"CATEGORY-HTTPDNS-CN",
+		"CATEGORY-LOGISTICS-CN",
+		"CATEGORY-MEDIA-CN",
+		"CATEGORY-MOOC-CN",
+		"CATEGORY-NETDISK-CN",
+		"CATEGORY-NETWORK-SECURITY-CN",
+		"CATEGORY-NTP-CN",
+		"CATEGORY-NUMBER-VERIFICATION-CN",
+		"CATEGORY-OUTSOURCE-CN",
+		"CATEGORY-SCHOLAR-CN",
+		"CATEGORY-SECURITIES-CN",
+		"CATEGORY-SOCIAL-MEDIA-CN",
+		"CATEGORY-WIKI-CN",
+
+		// 伊朗分类
+		"CATEGORY-ADS-IR",
+		"CATEGORY-BANK-IR",
+		"CATEGORY-BOURSE-IR",
+		"CATEGORY-EDUCATION-IR",
+		"CATEGORY-FORUMS-IR",
+		"CATEGORY-GOV-IR",
+		"CATEGORY-INSURANCE-IR",
+		"CATEGORY-MEDIA-IR",
+		"CATEGORY-NEWS-IR",
+		"CATEGORY-PAYMENT-IR",
+		"CATEGORY-SCHOLAR-IR",
+		"CATEGORY-SHOPPING-IR",
+		"CATEGORY-SOCIAL-MEDIA-IR",
+		"CATEGORY-TECH-IR",
+		"CATEGORY-TRAVEL-IR",
+
+		// 俄罗斯分类
+		"CATEGORY-GOV-RU",
+		"CATEGORY-MEDIA-RU",
+
+		// 色情分类
+		"CATEGORY-PORN",
+	}
+}
+
+// GetChineseCategoryFiles 获取中国相关的分类文件（保持向后兼容）
+func GetChineseCategoryFiles() []fileName {
+	return []fileName{
+		"CN",
+		"GEOLOCATION-CN",
+		"TLD-CN",
+		"CATEGORY-AI-CN",
+		"CATEGORY-BANK-CN",
+		"CATEGORY-BLOG-CN",
+		"CATEGORY-COLLABORATE-CN",
+		"CATEGORY-DEV-CN",
+		"CATEGORY-DOCUMENTS-CN",
+		"CATEGORY-EDUCATION-CN",
+		"CATEGORY-ELECTRONIC-CN",
+		"CATEGORY-ENTERPRISE-QUERY-PLATFORM-CN",
+		"CATEGORY-ENTERTAINMENT-CN",
+		"CATEGORY-FOOD-CN",
+		"CATEGORY-GAME-ACCELERATOR-CN",
+		"CATEGORY-GAMES-CN",
+		"CATEGORY-HOSPITAL-CN",
+		"CATEGORY-HTTPDNS-CN",
+		"CATEGORY-LOGISTICS-CN",
+		"CATEGORY-MEDIA-CN",
+		"CATEGORY-MOOC-CN",
+		"CATEGORY-NETDISK-CN",
+		"CATEGORY-NETWORK-SECURITY-CN",
+		"CATEGORY-NTP-CN",
+		"CATEGORY-NUMBER-VERIFICATION-CN",
+		"CATEGORY-OUTSOURCE-CN",
+		"CATEGORY-SCHOLAR-CN",
+		"CATEGORY-SECURITIES-CN",
+		"CATEGORY-SOCIAL-MEDIA-CN",
+		"CATEGORY-WIKI-CN",
+	}
 }

@@ -1,0 +1,14 @@
+domain:payping.ir
+domain:weswap.digital
+domain:behpardakht.com
+domain:iranicard.ir
+domain:mydigipay.com
+domain:pay.ir
+domain:zarinpal.com
+domain:asanpardakht.com
+domain:asanpardakht.net
+domain:sadadpsp.ir
+domain:sep.ir
+domain:shaparak.ir
+domain:pec.ir
+domain:pep.co.ir

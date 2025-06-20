@@ -155,6 +155,12 @@ domain:alipay.hk:@
 domain:alipaymo.com:@
 domain:tmall.ru:@
 domain:fliggy.hk:@
+domain:alibabacloud.co.in:@
+domain:alibabacloud.com.au:@
+domain:alibabacloud.com.hk:@
+domain:alibabacloud.com.my:@
+domain:alibabacloud.com.sg:@
+domain:alibabacloud.com.tw:@
 domain:a.alimama.cn:@ads
 domain:acjs.aliyun.com:@ads
 domain:adash-c.m.taobao.com:@ads
@@ -253,12 +259,6 @@ domain:v6-adashx.ut.ele.me:@ads
 domain:v6-adashx.ut.taobao.com:@ads
 domain:w.m.taobao.com:@ads
 domain:yiliao.hupan.com:@ads
-domain:alibabacloud.co.in:@
-domain:alibabacloud.com.au:@
-domain:alibabacloud.com.hk:@
-domain:alibabacloud.com.my:@
-domain:alibabacloud.com.sg:@
-domain:alibabacloud.com.tw:@
 domain:a.alimama.cn:@ads
 domain:acjs.aliyun.com:@ads
 domain:adash-c.m.taobao.com:@ads

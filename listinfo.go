@@ -442,7 +442,6 @@ func GetMultiCountryCategoryFiles() []fileName {
 	return []fileName{
 		// 中国分类
 		"CN",
-		"GEOLOCATION-CN",
 		"TLD-CN",
 		"CATEGORY-AI-CN",
 		"CATEGORY-BANK-CN",
@@ -502,7 +501,6 @@ func GetMultiCountryCategoryFiles() []fileName {
 func GetChineseCategoryFiles() []fileName {
 	return []fileName{
 		"CN",
-		"GEOLOCATION-CN",
 		"TLD-CN",
 		"CATEGORY-AI-CN",
 		"CATEGORY-BANK-CN",

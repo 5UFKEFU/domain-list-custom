@@ -1,7 +1,3 @@
-# This list is for backward compatibility of "geosite:cn" in V2Ray.
-
-include:tld-cn
-
 # List of all domains that have access point in China mainland
 
 # Advertisment & Analytics

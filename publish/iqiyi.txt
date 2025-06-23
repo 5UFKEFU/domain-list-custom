@@ -7,7 +7,7 @@ domain:qiyi.com
 domain:qiyipic.com
 domain:qy.net
 domain:71edge.com
-domain:iq.com:@
+domain:iq.com:@!cn
 domain:a.ckm.iqiyi.com:@ads
 domain:ad.m.iqiyi.com:@ads
 domain:afp.iqiyi.com:@ads

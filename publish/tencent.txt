@@ -60,11 +60,11 @@ domain:qq.com.cn
 domain:qq.cn.com
 domain:gtimg.com.cn
 domain:foxmail.com.cn
-domain:tencent.co.id:@
-domain:tencent.com.hk:@
-domain:wetv.vip:@
-domain:wetvinfo.com:@
-full:wetv.qq.com:@
+domain:tencent.co.id:@!cn
+domain:tencent.com.hk:@!cn
+domain:wetv.vip:@!cn
+domain:wetvinfo.com:@!cn
+full:wetv.qq.com:@!cn
 domain:ad.qq.com:@ads
 domain:ad.qun.qq.com:@ads
 domain:adfilter.imtt.qq.com:@ads

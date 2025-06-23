@@ -2,4 +2,4 @@ domain:iqoo.com
 domain:vivo.cn
 domain:vivo.com
 domain:vivo.com.cn
-domain:vivoglobal.com:@
+domain:vivoglobal.com:@!cn

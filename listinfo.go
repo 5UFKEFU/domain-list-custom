@@ -166,9 +166,9 @@ func (l *ListInfo) parseAttribute(attr string) (*router.Domain_Attribute, error)
 	}
 	attr = attr[1:] // Trim out attribute prefix `@` character
 
-	// 只允许小写字母、数字、-、_，否则警告
+	// 允许小写字母、数字、-、_、!，否则警告
 	for _, c := range attr {
-		if !(c >= 'a' && c <= 'z') && !(c >= '0' && c <= '9') && c != '-' && c != '_' {
+		if !(c >= 'a' && c <= 'z') && !(c >= '0' && c <= '9') && c != '-' && c != '_' && c != '!' {
 			fmt.Printf("[警告] 未知属性: @%s，已跳过\n", attr)
 			return nil, nil // 跳过未知属性
 		}
@@ -440,6 +440,9 @@ func (r *RecursiveIncludeProcessor) GetAllIncludedFiles() []fileName {
 // GetMultiCountryCategoryFiles 获取多国家相关的分类文件
 func GetMultiCountryCategoryFiles() []fileName {
 	return []fileName{
+		// 私有网络分类
+		"PRIVATE",
+
 		// 中国分类
 		"CN",
 		"TLD-CN",
@@ -500,6 +503,10 @@ func GetMultiCountryCategoryFiles() []fileName {
 // GetChineseCategoryFiles 获取中国相关的分类文件（保持向后兼容）
 func GetChineseCategoryFiles() []fileName {
 	return []fileName{
+		// 私有网络分类
+		"PRIVATE",
+
+		// 中国分类
 		"CN",
 		"TLD-CN",
 		"CATEGORY-AI-CN",

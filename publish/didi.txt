@@ -5,7 +5,7 @@ domain:didistatic.com
 domain:udache.com
 domain:xiaojukeji.com
 domain:diditaxi.com.cn
-domain:didi-food.com:@
-domain:didiaustralia.blog:@
-domain:didiglobal.com:@
-domain:didimobility.co.jp:@
+domain:didi-food.com:@!cn
+domain:didiaustralia.blog:@!cn
+domain:didiglobal.com:@!cn
+domain:didimobility.co.jp:@!cn

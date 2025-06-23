@@ -225,10 +225,10 @@ domain:jd-ex.com.cn
 domain:duiou.com.cn
 domain:chinabank.com.cn
 domain:360buy.com.cn
-domain:jd.co.th:@
-domain:jd.hk:@
-domain:jd.id:@
-domain:jd.ru:@
+domain:jd.co.th:@!cn
+domain:jd.hk:@!cn
+domain:jd.id:@!cn
+domain:jd.ru:@!cn
 domain:ads.union.jd.com:@ads
 domain:ads-union.jd.com:@ads
 domain:c-nfa.jd.com:@ads

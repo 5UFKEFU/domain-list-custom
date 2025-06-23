@@ -38,7 +38,7 @@ domain:im9.com
 domain:maoercdn.com
 domain:mincdn.com
 domain:yo9.com
-domain:bilibili.tv:@
-domain:biliintl.com:@
-domain:dreamcast.hk:@
-full:upos-hz-mirrorakam.akamaized.net:@
+domain:bilibili.tv:@!cn
+domain:biliintl.com:@!cn
+domain:dreamcast.hk:@!cn
+full:upos-hz-mirrorakam.akamaized.net:@!cn

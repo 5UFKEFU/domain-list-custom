@@ -37,8 +37,8 @@ domain:youpin.cn
 domain:youpin.com.cn
 domain:xiaomiinc.com.cn
 domain:xiaomidns.com.cn
-domain:c.mi.com:@
-domain:global.market.xiaomi.com:@
+domain:c.mi.com:@!cn
+domain:global.market.xiaomi.com:@!cn
 domain:a.market.xiaomi.com:@ads
 domain:ad.intl.xiaomi.com:@ads
 domain:ad.mi.com:@ads

@@ -15,7 +15,7 @@ var (
 	dataPath            = flag.String("datapath", filepath.Join("./", "data"), "Path to your custom 'data' directory")
 	datName             = flag.String("datname", "geosite.dat", "Name of the generated dat file")
 	outputPath          = flag.String("outputpath", "./publish", "Output path to the generated files")
-	exportLists         = flag.String("exportlists", "google,apple,meta,facebook,facebook-dev,instagram,messenger,oculus,threads,whatsapp,microsoft,amazon,tiktok,baidu,baidu-ads,alibaba,alibaba-ads,alibabacloud,tencent,tencent-ads,bytedance,bytedance-ads,xiaomi,huawei,huaweicloud,oppo,vivo,meituan,didi,jd,netease,sina,sohu,iqiyi,youku,bilibili,category-ai-cn,category-ai-!cn,openai,anthropic,google-deepmind,groq,huggingface,perplexity,poe,xai,cursor,cn,tld-cn,category-ir,category-ru,mailru,ok,ozon,vk,yandex,category-gov-ru,category-porn,category-ads-all,taboola,category-ads,acfun-ads,adcolony-ads,adjust-ads,adobe-ads,amazon-ads,apple-ads,applovin-ads,atom-data-ads,category-ads-ir,clearbitjs-ads,dmm-ads,duolingo-ads,emogi-ads,flurry-ads,google-ads,growingio-ads,hiido-ads,hotjar-ads,hunantv-ads,inner-active-ads,iqiyi-ads,jd-ads,kuaishou-ads,kugou-ads,leanplum-ads,letv-ads,mixpanel-ads,mopub-ads,mxplayer-ads,netease-ads,newrelic-ads,ogury-ads,onesignal-ads,ookla-speedtest-ads,openx-ads,pocoiq-ads,pubmatic-ads,qihoo360-ads,ruanmei,segment-ads,sensorsdata-ads,sina-ads,sohu-ads,spotify-ads,supersonic-ads,tagtic-ads,tappx-ads,television-ads,tencent-ads,uberads-ads,umeng-ads,unity-ads,vivo,wteam-ads,xhamster-ads,xiaomi-ads,ximalaya-ads,yahoo-ads,zynga-ads,android,blogspot,dart,fastlane,firebase,flutter,golang,google-gemini,google-play,google-registry,google-scholar,google-trust-services,googlefcm,kaggle,opensourceinsights,polymer,v8,youtube,apple-dev,apple-pki,apple-tvplus,apple-update,beats,icloud,itunes,swift,azure,bing,github,microsoft-dev,microsoft-pki,msn,onedrive,xbox,amazontrust,aws,imdb,kindle,primevideo,wholefoodsmarket", "export lists")
+	exportLists         = flag.String("exportlists", "google,apple,meta,facebook,facebook-dev,instagram,messenger,oculus,threads,whatsapp,microsoft,amazon,tiktok,baidu,baidu-ads,alibaba,alibaba-ads,alibabacloud,tencent,tencent-ads,bytedance,bytedance-ads,xiaomi,huawei,huaweicloud,oppo,vivo,meituan,didi,jd,netease,sina,sohu,iqiyi,youku,bilibili,category-ai-cn,category-ai-!cn,openai,anthropic,google-deepmind,groq,huggingface,perplexity,poe,xai,cursor,cn,tld-cn,category-ir,category-ru,mailru,ok,ozon,vk,yandex,category-gov-ru,category-porn,category-ads-all,taboola,category-ads,acfun-ads,adcolony-ads,adjust-ads,adobe-ads,amazon-ads,apple-ads,applovin-ads,atom-data-ads,category-ads-ir,clearbitjs-ads,dmm-ads,duolingo-ads,emogi-ads,flurry-ads,google-ads,growingio-ads,hiido-ads,hotjar-ads,hunantv-ads,inner-active-ads,iqiyi-ads,jd-ads,kuaishou-ads,kugou-ads,leanplum-ads,letv-ads,mixpanel-ads,mopub-ads,mxplayer-ads,netease-ads,newrelic-ads,ogury-ads,onesignal-ads,ookla-speedtest-ads,openx-ads,pocoiq-ads,pubmatic-ads,qihoo360-ads,ruanmei,segment-ads,sensorsdata-ads,sina-ads,sohu-ads,spotify-ads,supersonic-ads,tagtic-ads,tappx-ads,television-ads,tencent-ads,uberads-ads,umeng-ads,unity-ads,vivo,wteam-ads,xhamster-ads,xiaomi-ads,ximalaya-ads,yahoo-ads,zynga-ads,android,blogspot,dart,fastlane,firebase,flutter,golang,google-gemini,google-play,google-registry,google-scholar,google-trust-services,googlefcm,kaggle,opensourceinsights,polymer,v8,youtube,apple-dev,apple-pki,apple-tvplus,apple-update,beats,icloud,itunes,swift,azure,bing,github,microsoft-dev,microsoft-pki,msn,onedrive,xbox,amazontrust,aws,imdb,kindle,primevideo,wholefoodsmarket,private", "export lists")
 	excludeAttrs        = flag.String("excludeattrs", "", "Exclude rules with certain attributes in certain lists, seperated by ',' comma, support multiple attributes in one list. Example: geolocation-!cn@cn@ads,geolocation-cn@!cn")
 	toGFWList           = flag.String("togfwlist", "", "List to be exported in GFWList format")
 	useRecursiveInclude = flag.Bool("recursive", false, "Use recursive include processing for Chinese domains")
@@ -63,7 +63,7 @@ func mergeCategories(lm *ListInfoMap) {
 			"tencent-ads", "tencent-games", "yuewen", "qcloud", "tencent-dev",
 		},
 		"bytedance": {
-			"bytedance-ads", "bcy", "fqnovel", "juejin", "lark", "tiktok", "volcengine",
+			"bytedance-ads", "bcy", "fqnovel", "juejin", "lark", "volcengine",
 		},
 		"xiaomi": {
 			"xiaomi-ads",
@@ -312,6 +312,18 @@ func main() {
 			exportListsSlice = append(exportListsSlice, strings.ToLower(string(filename)))
 		}
 
+		// 确保 private 分类被包含
+		foundPrivate := false
+		for _, v := range exportListsSlice {
+			if v == "private" {
+				foundPrivate = true
+				break
+			}
+		}
+		if !foundPrivate {
+			exportListsSlice = append(exportListsSlice, "private")
+		}
+
 		fmt.Printf("最终将处理 %d 个文件（%s模式）\n", len(exportListsSlice), modeDescription)
 	} else {
 		// 原有的处理逻辑
@@ -389,6 +401,17 @@ func main() {
 		if !mergedSubCategories[exportList] {
 			filteredExportLists = append(filteredExportLists, exportList)
 		}
+	}
+	// 确保 private 分类被包含
+	foundPrivate := false
+	for _, v := range filteredExportLists {
+		if v == "private" {
+			foundPrivate = true
+			break
+		}
+	}
+	if !foundPrivate {
+		filteredExportLists = append(filteredExportLists, "private")
 	}
 
 	fmt.Printf("过滤后剩余 %d 个分类文件（已移除 %d 个被合并的子分类）\n", len(filteredExportLists), len(exportListsSlice)-len(filteredExportLists))

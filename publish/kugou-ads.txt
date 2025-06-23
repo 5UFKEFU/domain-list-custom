@@ -1,3 +1,0 @@
-domain:ads.service.kugou.com:@ads
-domain:adserviceretry.kglink.cn:@ads
-domain:adserviceretry.kugou.com:@ads

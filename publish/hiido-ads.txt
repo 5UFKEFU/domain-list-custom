@@ -1,2 +1,0 @@
-domain:mlog.hiido.com:@ads
-domain:ylog.hiido.com:@ads

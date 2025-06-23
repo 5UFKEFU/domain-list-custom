@@ -1,2 +1,0 @@
-domain:cdn.pocoiq.cn:@ads
-domain:oct.pocoiq.cn:@ads

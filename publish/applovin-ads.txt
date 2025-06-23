@@ -1,2 +1,0 @@
-domain:applovin.com:@ads
-domain:applvn.com:@ads

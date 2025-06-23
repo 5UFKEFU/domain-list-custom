@@ -15,7 +15,7 @@ var (
 	dataPath            = flag.String("datapath", filepath.Join("./", "data"), "Path to your custom 'data' directory")
 	datName             = flag.String("datname", "geosite.dat", "Name of the generated dat file")
 	outputPath          = flag.String("outputpath", "./publish", "Output path to the generated files")
-	exportLists         = flag.String("exportlists", "google,apple,meta,microsoft,amazon,tiktok,baidu,baidu-ads,alibaba,alibaba-ads,alibabacloud,tencent,tencent-ads,bytedance,bytedance-ads,xiaomi,huawei,huaweicloud,oppo,vivo,meituan,didi,jd,netease,sina,sohu,iqiyi,youku,bilibili,category-ai-cn,category-ai-!cn,openai,anthropic,google-deepmind,groq,huggingface,perplexity,poe,xai,cursor,cn,tld-cn,category-ir,category-ru,mailru,ok,ozon,vk,yandex,category-gov-ru,category-porn,category-ads-all,taboola,category-ads,acfun-ads,adcolony-ads,adjust-ads,adobe-ads,amazon-ads,apple-ads,applovin-ads,atom-data-ads,category-ads-ir,clearbitjs-ads,dmm-ads,duolingo-ads,emogi-ads,flurry-ads,google-ads,growingio-ads,hiido-ads,hotjar-ads,hunantv-ads,inner-active-ads,iqiyi-ads,jd-ads,kuaishou-ads,kugou-ads,leanplum-ads,letv-ads,mixpanel-ads,mopub-ads,mxplayer-ads,netease-ads,newrelic-ads,ogury-ads,onesignal-ads,ookla-speedtest-ads,openx-ads,pocoiq-ads,pubmatic-ads,qihoo360-ads,ruanmei,segment-ads,sensorsdata-ads,sina-ads,sohu-ads,spotify-ads,supersonic-ads,tagtic-ads,tappx-ads,television-ads,tencent-ads,uberads-ads,umeng-ads,unity-ads,vivo,wteam-ads,xhamster-ads,xiaomi-ads,ximalaya-ads,yahoo-ads,zynga-ads", "export lists")
+	exportLists         = flag.String("exportlists", "google,apple,meta,facebook,facebook-dev,instagram,messenger,oculus,threads,whatsapp,microsoft,amazon,tiktok,baidu,baidu-ads,alibaba,alibaba-ads,alibabacloud,tencent,tencent-ads,bytedance,bytedance-ads,xiaomi,huawei,huaweicloud,oppo,vivo,meituan,didi,jd,netease,sina,sohu,iqiyi,youku,bilibili,category-ai-cn,category-ai-!cn,openai,anthropic,google-deepmind,groq,huggingface,perplexity,poe,xai,cursor,cn,tld-cn,category-ir,category-ru,mailru,ok,ozon,vk,yandex,category-gov-ru,category-porn,category-ads-all,taboola,category-ads,acfun-ads,adcolony-ads,adjust-ads,adobe-ads,amazon-ads,apple-ads,applovin-ads,atom-data-ads,category-ads-ir,clearbitjs-ads,dmm-ads,duolingo-ads,emogi-ads,flurry-ads,google-ads,growingio-ads,hiido-ads,hotjar-ads,hunantv-ads,inner-active-ads,iqiyi-ads,jd-ads,kuaishou-ads,kugou-ads,leanplum-ads,letv-ads,mixpanel-ads,mopub-ads,mxplayer-ads,netease-ads,newrelic-ads,ogury-ads,onesignal-ads,ookla-speedtest-ads,openx-ads,pocoiq-ads,pubmatic-ads,qihoo360-ads,ruanmei,segment-ads,sensorsdata-ads,sina-ads,sohu-ads,spotify-ads,supersonic-ads,tagtic-ads,tappx-ads,television-ads,tencent-ads,uberads-ads,umeng-ads,unity-ads,vivo,wteam-ads,xhamster-ads,xiaomi-ads,ximalaya-ads,yahoo-ads,zynga-ads,android,blogspot,dart,fastlane,firebase,flutter,golang,google-gemini,google-play,google-registry,google-scholar,google-trust-services,googlefcm,kaggle,opensourceinsights,polymer,v8,youtube,apple-dev,apple-pki,apple-tvplus,apple-update,beats,icloud,itunes,swift,azure,bing,github,microsoft-dev,microsoft-pki,msn,onedrive,xbox,amazontrust,aws,imdb,kindle,primevideo,wholefoodsmarket", "export lists")
 	excludeAttrs        = flag.String("excludeattrs", "", "Exclude rules with certain attributes in certain lists, seperated by ',' comma, support multiple attributes in one list. Example: geolocation-!cn@cn@ads,geolocation-cn@!cn")
 	toGFWList           = flag.String("togfwlist", "", "List to be exported in GFWList format")
 	useRecursiveInclude = flag.Bool("recursive", false, "Use recursive include processing for Chinese domains")
@@ -24,6 +24,202 @@ var (
 	getList             = flag.String("getlist", "", "Get all domains from a specific list (e.g., tiktok, category-ads-all)")
 	getAllAds           = flag.Bool("getallads", false, "Get all advertising domains from all -ads files")
 )
+
+// mergeCategories 将子分类合并到主分类中，并删除子分类以减少文件大小
+func mergeCategories(lm *ListInfoMap) {
+	// 定义主分类和其对应的子分类
+	categoryMappings := map[string][]string{
+		"google": {
+			"google-ads", "google-deepmind", "google-gemini", "google-play",
+			"google-registry", "google-scholar", "google-trust-services",
+			"googlefcm", "android", "blogspot", "dart", "fastlane", "firebase",
+			"flutter", "golang", "kaggle", "opensourceinsights", "polymer",
+			"v8", "youtube",
+		},
+		"apple": {
+			"apple-ads", "apple-dev", "apple-pki", "apple-tvplus",
+			"apple-update", "beats", "icloud", "itunes", "swift",
+		},
+		"microsoft": {
+			"microsoft-dev", "microsoft-pki", "azure", "bing", "github",
+			"msn", "onedrive", "xbox",
+		},
+		"amazon": {
+			"amazon-ads", "amazontrust", "aws", "imdb", "kindle",
+			"primevideo", "wholefoodsmarket",
+		},
+		"meta": {
+			"facebook", "facebook-dev", "instagram", "messenger",
+			"oculus", "threads", "whatsapp",
+		},
+		"baidu": {
+			"baidu-ads", "zuoyebang",
+		},
+		"alibaba": {
+			"alibaba-ads", "alibabacloud", "aliyun", "dingtalk", "eleme",
+			"teambition", "amap", "cainiao", "uc", "umeng",
+		},
+		"tencent": {
+			"tencent-ads", "tencent-games", "yuewen", "qcloud", "tencent-dev",
+		},
+		"bytedance": {
+			"bytedance-ads", "bcy", "fqnovel", "juejin", "lark", "tiktok", "volcengine",
+		},
+		"xiaomi": {
+			"xiaomi-ads",
+		},
+		"huawei": {
+			"huaweicloud", "huawei-dev",
+		},
+		"jd": {
+			"jd-ads",
+		},
+		"netease": {
+			"netease-ads",
+		},
+		"sina": {
+			"sina-ads",
+		},
+		"sohu": {
+			"sohu-ads", "sogou",
+		},
+		"iqiyi": {
+			"iqiyi-ads",
+		},
+		"youku": {
+			"youku-ads",
+		},
+		"bilibili": {
+			"bilibili-game",
+		},
+		"instagram": {
+			"instagram-ads",
+		},
+		"whatsapp": {
+			"whatsapp-ads",
+		},
+		"xbox": {
+			"bethesda", "forza", "mojang", "asobo",
+		},
+		"aws": {
+			"aws-cn",
+		},
+		"icloud": {
+			"icloudprivaterelay",
+		},
+		"cn": {
+			"tld-cn",
+		},
+		"category-ai-cn": {
+			"deepseek",
+		},
+		"google-gemini": {
+			"google-deepmind",
+		},
+		"category-porn": {
+			"fans66", "lethalhardcore", "nudevista", "yunlaopo", "fansta", "hentaivn",
+			"javcc", "jkf", "18comic", "boboporn", "zhimeishe", "camwhores", "chatwhores",
+			"kubakuba", "54647", "anon-v", "bttzyw", "lisiku", "bongacams", "dlsite",
+			"konachan", "moxing", "truyen-hentai", "xhamster", "youjizz", "haitang",
+			"heyzo", "smtiaojiaoshi", "xingkongwuxianmedia", "hooligapps", "illusion-nonofficial",
+			"jable", "shireyishunjian", "swag", "uu-chat", "cuinc", "dmm-porn", "javbus",
+			"kemono", "pornpros", "tokyo-toshokan", "erolabs", "picacg", "sehuatang",
+			"bdsmhub", "clips4sale", "johren", "justav", "metart", "thescoregroup",
+			"xnxx", "cavporn", "javdb", "missav", "netflav", "avmoo", "bilibili2",
+			"boylove", "ehentai", "illusion", "mindgeek-porn", "playboy", "spankbang",
+			"japonx", "javwide", "theporndude", "xvideos",
+		},
+		"category-ads": {
+			"emogi-ads", "hunantv-ads", "iqiyi-ads", "kuaishou-ads", "newrelic-ads",
+			"tencent-ads", "tagtic-ads", "wteam-ads", "alibaba-ads", "flurry-ads",
+			"hotjar-ads", "jd-ads", "kugou-ads", "onesignal-ads", "adjust-ads",
+			"openx-ads", "supersonic-ads", "adobe-ads", "applovin-ads", "mopub-ads",
+			"ookla-speedtest-ads", "spotify-ads", "youku-ads", "acfun-ads", "amazon-ads",
+			"duolingo-ads", "pocoiq-ads", "segment-ads", "xhamster-ads", "adcolony-ads",
+			"hiido-ads", "sensorsdata-ads", "xiaomi-ads", "tappx-ads", "yahoo-ads",
+			"mixpanel-ads", "qihoo360-ads", "atom-data-ads", "leanplum-ads", "sohu-ads",
+			"unity-ads", "bytedance-ads", "clearbitjs-ads", "zynga-ads", "apple-ads",
+			"sina-ads", "uberads-ads", "baidu-ads", "category-ads-ir", "letv-ads",
+			"ogury-ads", "television-ads", "umeng-ads", "google-ads", "netease-ads",
+			"pubmatic-ads", "growingio-ads", "inner-active-ads", "mxplayer-ads",
+			"ximalaya-ads", "dmm-ads",
+		},
+		"category-ads-all": {
+			"category-ads", "taboola",
+		},
+		"category-ir": {
+			"category-travel-ir", "category-bourse-ir", "category-education-ir",
+			"category-insurance-ir", "category-forums-ir", "category-gov-ir",
+			"category-news-ir", "category-social-media-ir", "category-tech-ir",
+			"category-bank-ir", "category-media-ir", "category-payment-ir",
+			"category-scholar-ir", "category-shopping-ir", "snapp",
+		},
+		"category-ru": {
+			"ozon", "vk", "yandex", "category-gov-ru", "mailru", "ok",
+		},
+		"category-ai-!cn": {
+			"huggingface", "openai", "anthropic", "groq", "perplexity", "poe", "xai", "cursor", "google-deepmind",
+		},
+		"oppo": {
+			"oneplus",
+		},
+	}
+
+	// 记录要删除的子分类
+	subCategoriesToDelete := make(map[fileName]bool)
+
+	// 遍历每个主分类，合并其子分类
+	for mainCategory, subCategories := range categoryMappings {
+		mainFileName := fileName(strings.ToUpper(mainCategory))
+		mainListInfo, mainExists := (*lm)[mainFileName]
+
+		if !mainExists {
+			continue
+		}
+
+		// 合并每个子分类的内容
+		for _, subCategory := range subCategories {
+			subFileName := fileName(strings.ToUpper(subCategory))
+			subListInfo, subExists := (*lm)[subFileName]
+
+			if !subExists {
+				continue
+			}
+
+			// 合并域名列表
+			mainListInfo.DomainTypeList = append(mainListInfo.DomainTypeList, subListInfo.DomainTypeList...)
+			mainListInfo.FullTypeList = append(mainListInfo.FullTypeList, subListInfo.FullTypeList...)
+			mainListInfo.KeywordTypeList = append(mainListInfo.KeywordTypeList, subListInfo.KeywordTypeList...)
+			mainListInfo.RegexpTypeList = append(mainListInfo.RegexpTypeList, subListInfo.RegexpTypeList...)
+			mainListInfo.AttributeRuleUniqueList = append(mainListInfo.AttributeRuleUniqueList, subListInfo.AttributeRuleUniqueList...)
+
+			// 合并属性规则映射
+			for attr, rules := range subListInfo.AttributeRuleListMap {
+				mainListInfo.AttributeRuleListMap[attr] = append(mainListInfo.AttributeRuleListMap[attr], rules...)
+			}
+
+			// 合并包含关系
+			if subListInfo.HasInclusion {
+				mainListInfo.HasInclusion = true
+				for subFile, attrs := range subListInfo.InclusionAttributeMap {
+					mainListInfo.InclusionAttributeMap[subFile] = append(mainListInfo.InclusionAttributeMap[subFile], attrs...)
+				}
+			}
+
+			// 标记子分类为要删除
+			subCategoriesToDelete[subFileName] = true
+		}
+	}
+
+	// 删除所有子分类
+	deletedCount := 0
+	for subFileName := range subCategoriesToDelete {
+		delete(*lm, subFileName)
+		deletedCount++
+	}
+
+	fmt.Printf("已删除 %d 个子分类以减少文件大小\n", deletedCount)
+}
 
 func main() {
 	flag.Parse()
@@ -134,6 +330,69 @@ func main() {
 		os.Exit(1)
 	}
 
+	// 合并子分类到主分类中
+	mergeCategories(&listInfoMap)
+	fmt.Println("已合并子分类到主分类中")
+
+	// 过滤掉已经被合并的子分类，避免生成重复的独立文件
+	var filteredExportLists []string
+	mergedSubCategories := make(map[string]bool)
+
+	// 收集所有被合并的子分类
+	categoryMappings := map[string][]string{
+		"google": {
+			"android", "blogspot", "dart", "fastlane", "firebase", "flutter", "golang", "google-ads", "google-deepmind", "google-gemini", "google-play", "google-registry", "google-scholar", "google-trust-services", "googlefcm", "kaggle", "opensourceinsights", "polymer", "v8", "youtube",
+		},
+		"apple": {
+			"apple-ads", "apple-dev", "apple-pki", "apple-tvplus", "apple-update", "beats", "icloud", "itunes", "swift",
+		},
+		"microsoft": {
+			"azure", "bing", "github", "microsoft-dev", "microsoft-pki", "msn", "onedrive", "xbox",
+		},
+		"amazon": {
+			"amazontrust", "aws", "imdb", "kindle", "primevideo", "wholefoodsmarket",
+		},
+		"meta": {
+			"facebook", "facebook-dev", "instagram", "messenger", "oculus", "threads", "whatsapp",
+		},
+		"category-porn": {
+			"bilibili2", "lethalhardcore", "nudevista", "yunlaopo", "fansta", "hentaivn", "javcc", "jkf", "18comic", "boboporn", "zhimeishe", "camwhores", "chatwhores", "kubakuba", "54647", "anon-v", "bttzyw", "lisiku", "bongacams", "dlsite", "konachan", "moxing", "truyen-hentai", "xhamster", "youjizz", "haitang", "heyzo", "smtiaojiaoshi", "xingkongwuxianmedia", "hooligapps", "illusion-nonofficial", "jable", "shireyishunjian", "swag", "uu-chat", "cuinc", "dmm-porn", "javbus", "kemono", "pornpros", "tokyo-toshokan", "erolabs", "picacg", "sehuatang", "bdsmhub", "clips4sale", "johren", "justav", "metart", "thescoregroup", "xnxx", "cavporn", "javdb", "missav", "netflav", "avmoo", "boylove", "ehentai", "illusion", "mindgeek-porn", "playboy", "spankbang", "japonx", "javwide", "theporndude", "xvideos",
+		},
+		"category-ads": {
+			"emogi-ads", "hunantv-ads", "iqiyi-ads", "kuaishou-ads", "newrelic-ads", "tencent-ads", "tagtic-ads", "wteam-ads", "alibaba-ads", "flurry-ads", "hotjar-ads", "jd-ads", "kugou-ads", "onesignal-ads", "adjust-ads", "openx-ads", "supersonic-ads", "adobe-ads", "applovin-ads", "mopub-ads", "ookla-speedtest-ads", "spotify-ads", "youku-ads", "acfun-ads", "amazon-ads", "duolingo-ads", "pocoiq-ads", "segment-ads", "xhamster-ads", "adcolony-ads", "hiido-ads", "sensorsdata-ads", "xiaomi-ads", "tappx-ads", "yahoo-ads", "mixpanel-ads", "qihoo360-ads", "atom-data-ads", "leanplum-ads", "sohu-ads", "unity-ads", "bytedance-ads", "clearbitjs-ads", "zynga-ads", "apple-ads", "sina-ads", "uberads-ads", "baidu-ads", "category-ads-ir", "letv-ads", "ogury-ads", "television-ads", "umeng-ads", "google-ads", "netease-ads", "pubmatic-ads", "growingio-ads", "inner-active-ads", "mxplayer-ads", "ximalaya-ads", "dmm-ads",
+		},
+		"category-ads-all": {
+			"category-ads", "taboola",
+		},
+		"category-ir": {
+			"category-travel-ir", "category-bourse-ir", "category-education-ir", "category-insurance-ir", "category-forums-ir", "category-gov-ir", "category-news-ir", "category-social-media-ir", "category-tech-ir", "category-bank-ir", "category-media-ir", "category-payment-ir", "category-scholar-ir", "category-shopping-ir", "snapp",
+		},
+		"category-ru": {
+			"ozon", "vk", "yandex", "category-gov-ru", "mailru", "ok",
+		},
+		"category-ai-!cn": {
+			"huggingface", "openai", "anthropic", "groq", "perplexity", "poe", "xai", "cursor", "google-deepmind",
+		},
+		"oppo": {
+			"oneplus",
+		},
+	}
+
+	for _, subCategories := range categoryMappings {
+		for _, subCategory := range subCategories {
+			mergedSubCategories[strings.ToLower(subCategory)] = true
+		}
+	}
+
+	// 过滤掉已经被合并的子分类
+	for _, exportList := range exportListsSlice {
+		if !mergedSubCategories[exportList] {
+			filteredExportLists = append(filteredExportLists, exportList)
+		}
+	}
+
+	fmt.Printf("过滤后剩余 %d 个分类文件（已移除 %d 个被合并的子分类）\n", len(filteredExportLists), len(exportListsSlice)-len(filteredExportLists))
+
 	// Process and split *excludeRules
 	excludeAttrsInFile := make(map[fileName]map[attribute]bool)
 	if *excludeAttrs != "" {
@@ -172,7 +431,7 @@ func main() {
 	}
 
 	// Generate plaintext list files
-	if filePlainTextBytesMap, err := listInfoMap.ToPlainText(exportListsSlice); err == nil {
+	if filePlainTextBytesMap, err := listInfoMap.ToPlainText(filteredExportLists); err == nil {
 		for filename, plaintextBytes := range filePlainTextBytesMap {
 			filename += ".txt"
 			if err := os.WriteFile(filepath.Join(*outputPath, filename), plaintextBytes, 0644); err != nil {

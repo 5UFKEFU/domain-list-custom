@@ -1,4 +1,0 @@
-domain:adjust.com:@ads
-domain:adjust.net.in:@ads
-domain:adjust.io:@ads
-domain:adjust.world:@ads

@@ -1,1 +1,0 @@
-domain:cdn.segment.com:@ads

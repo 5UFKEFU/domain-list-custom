@@ -1,3 +1,0 @@
-domain:ogury.com:@ads
-domain:presage.io:@ads
-domain:ogury.co:@ads
